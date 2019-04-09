@@ -26,8 +26,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.opencsv.CSVReader;
 
 import it.objectmethod.magazino.entity.Lotto;
-import it.objectmethod.magazino.file.FileReadLotti;
 import it.objectmethod.magazino.repo.LottoRepo;
+import it.objectmethod.magazino.utility.FileReadCSV;
 
 @RestController
 @RequestMapping("api/lotto")
@@ -35,14 +35,26 @@ public class LottoRestController {
 
 	@Autowired
 	private LottoRepo lottoRepo;
-	@Autowired
-	private FileReadLotti fileRead;
 	
 	@PostMapping("/lotto-import")
 	public List<Lotto> importaLotti(@RequestParam("file") MultipartFile file) throws Exception{
 		
 		InputStream is = file.getInputStream();
-		List<Lotto> lottoList = fileRead.letturaLotti(is);
+		FileReadCSV fileRead = new FileReadCSV();
+		List<String[]> lottoString= fileRead.letturaFileCSV(is);
+		List<Lotto>lottoList = new ArrayList<>();
+	for(String arrayRead[]: lottoString) {
+			
+			Lotto lotto = new Lotto();
+			lotto.setId(Long.parseLong(arrayRead[0]));
+			lotto.setCodice(arrayRead[1]);
+			lotto.setQuantita(Integer.parseInt(arrayRead[2]));
+			lotto.setIdArticolo(Long.parseLong(arrayRead[3]));
+			lottoList.add(lotto);	
+			System.out.println(arrayRead[0]);
+			
+			
+		}
 		return lottoRepo.saveAll(lottoList);
 	}
 }

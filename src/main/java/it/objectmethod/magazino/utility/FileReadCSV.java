@@ -1,4 +1,4 @@
-package it.objectmethod.magazino.file;
+package it.objectmethod.magazino.utility;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -20,41 +20,33 @@ import it.objectmethod.magazino.entity.Articolo;
 import it.objectmethod.magazino.entity.Lotto;
 
 @Component
-public class FileReadArticoli {
+public class FileReadCSV {
 
-	public List<Articolo> letturaArticoli(InputStream f) throws Exception {
+	public List<String[]> letturaFileCSV(InputStream f) throws Exception {
 		BufferedInputStream inputStream = new BufferedInputStream(f);
 		Reader reader =  new BufferedReader(new InputStreamReader(inputStream));
-		List<Articolo> listArticoli = leggiTuttiArticoli(reader);
+		List<String[]> listArticoli = leggiTutto(reader);
 		reader.close();
 		inputStream.close();
 		return listArticoli;
 	}
-	private List<Articolo> leggiTuttiArticoli(Reader reader) throws IOException {
+	private List<String[]> leggiTutto(Reader reader) throws IOException {
 
 
 		CSVParser parser = new CSVParserBuilder()
-			    .withSeparator(';')
-			    .withIgnoreQuotations(true)
-			    .build();
-		
+				.withSeparator(';')
+				.withIgnoreQuotations(true)
+				.build();
+
 		CSVReader csvReader = new CSVReaderBuilder(reader)
-				    .withCSVParser(parser)
-				    .build();
+				.withCSVParser(parser)
+				.build();
 		List<String[]> lista = new ArrayList<>();
-		List<Articolo> articoloList = new ArrayList<>();
+
 		lista = csvReader.readAll();
-for(String arrayRead[]: lista) {
-			
-			Articolo articolo = new Articolo();
-			articolo.setId(Long.parseLong(arrayRead[0]));
-			articolo.setCodice(arrayRead[1]);
-			articolo.setDescrizione(arrayRead[2]);
-			articoloList.add(articolo);
-			
-		}
+
 		reader.close();
 		csvReader.close();
-		return articoloList;
+		return lista;
 	}
 }
